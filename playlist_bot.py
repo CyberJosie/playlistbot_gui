@@ -100,7 +100,8 @@ class BackPanel:
                                 url = pb.get_song_url_from_name(song_name=song_title)
                                 try:
                                         pb.download_song_from_url(url, output_location)
-                                        output+=f'{song_title}\n'
+                                        output+=f'Downloaded: {song_title}\n'
+                                        print(f'Downloaded: {song_title}')
                                         self.outputTextBox.configure(text=output)
                                 except Exception as e:
                                         output+=f"Failed: \"{song_title}\"\n"
@@ -109,7 +110,7 @@ class BackPanel:
                                 print(e)
                                 continue
                         self.outputTextBox.configure(text=output)
-                        print(output)
+
         
         
         def __init__(self, top=None):
