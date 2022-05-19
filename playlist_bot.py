@@ -41,75 +41,7 @@ class PlaylistBot:
         os.rename(out_file, new_file)
 
 
-
 class BackPanel:
-
-        def output(self, content):
-                self.outputTextBox.configure(text=content)
-
-        def load_file(self, path_to_file):
-                output = ""
-
-                ignored_lines = [
-                        ' ',
-                        '',
-                        '\n',
-                        '\r\n',
-                        '\t\n',
-                ]
-                print(path_to_file)
-                output += f'Loading: {path_to_file}..\n'
-                self.output(output)
-
-                if not os.path.isfile(path_to_file):
-                        output = f"{path_to_file} does\'nt exist.\n"
-                        self.output(output)
-                        return
-                        
-                
-                try:
-                        name_file = open(path_to_file, 'r')
-                        all_entries = name_file.readlines()
-                        name_file.close()
-                        
-                        output += f"Loaded: {path_to_file}.\n"
-                        self.output(output)
-                except Exception as e:
-                        output = f" Error reading from file: {path_to_file}\n"
-                        self.output(output)
-                        print(e)
-
-
-                cleaned_data = []
-                for song_name in all_entries:
-                        if song_name not in ignored_lines:
-                                cleaned_data.append(song_name.strip())
-
-
-                self.song_list = cleaned_data
-                print(cleaned_data)
-        
-        def create_playlist(self):
-                pb = PlaylistBot()
-                output = ''
-                output_location = str(round(time.time()))
-
-                self.output(f'Downloading {len(self.song_list)} songs..')
-                for song_title in self.song_list:
-                        try:
-                                url = pb.get_song_url_from_name(song_name=song_title)
-                                try:
-                                        pb.download_song_from_url(url, output_location)
-                                        output+=f'Downloaded: {song_title}\n'
-                                        print(f'Downloaded: {song_title}')
-                                        self.outputTextBox.configure(text=output)
-                                except Exception as e:
-                                        output+=f"Failed: \"{song_title}\"\n"
-                        except Exception as e:
-                                output+=f"Failed: \"{song_title}\"\n"
-                                print(e)
-                                continue
-                        self.outputTextBox.configure(text=output)
 
         
         
@@ -126,6 +58,7 @@ class BackPanel:
                 _bgmode = 'light'
 
                 self.song_list = []
+                self.console_data = ''
 
                 top.geometry("400x400+1172+276")
                 top.minsize(1, 1)
@@ -179,7 +112,7 @@ class BackPanel:
                 self.createPlaylistButton.configure(borderwidth="2")
                 self.createPlaylistButton.configure(compound='left')
                 self.createPlaylistButton.configure(relief="flat")
-                self.createPlaylistButton.configure(text='''Create Playlist''', command=lambda: self.create_playlist())
+                self.createPlaylistButton.configure(text='''Create Playlist''', command=self.create_playlist)
 
                 self.outputFrame = tk.Frame(self.top)
                 self.outputFrame.place(relx=0.013, rely=0.4, relheight=0.563
@@ -189,7 +122,10 @@ class BackPanel:
                 self.outputFrame.configure(relief="groove")
                 self.outputFrame.configure(background="#000000")
 
-                self.outputTextBox = tk.Label(self.outputFrame)
+                # self.console_output = tk.StringVar()
+                self.console_output = tk.StringVar()
+                
+                self.outputTextBox = tk.Label(self.outputFrame, textvariable=self.console_output, justify=LEFT)
                 self.outputTextBox.place(relx=0.026, rely=0.044, height=201, width=374)
                 self.outputTextBox.configure(activebackground="#f9f9f9")
                 self.outputTextBox.configure(anchor='nw')
@@ -197,7 +133,84 @@ class BackPanel:
                 self.outputTextBox.configure(compound='left')
                 self.outputTextBox.configure(font="-family {DejaVu Sans} -size 10")
                 self.outputTextBox.configure(foreground="#5fc3e8")
-                self.outputTextBox.configure(text='''> ''')
+                self.console_output.set(self.console_data)
+                # self.outputTextBox.configure(text=self.console_output)
+        
+        def add_output(self, output_text):
+                self.console_data += f"{output_text}\n"
+                self.console_output.set(self.console_data)
+                self.outputFrame.update()
+        
+        def load_file(self, path_to_file):
+                # output = ""
+
+                ignored_lines = [
+                        ' ',
+                        '',
+                        '\n',
+                        '\r\n',
+                        '\t\n',
+                ]
+
+                print(path_to_file)
+                # output += f'Loading: {path_to_file}..'
+                self.add_output(f'Loading: {path_to_file}..')
+
+                if not os.path.isfile(path_to_file):
+                        # output = f"{path_to_file} does\'nt exist."
+                        self.add_output(f"{path_to_file} does\'nt exist.")
+                        return
+                        
+                
+                try:
+                        name_file = open(path_to_file, 'r')
+                        all_entries = name_file.readlines()
+                        name_file.close()
+                        
+                        # output += f"Loaded: {path_to_file}."
+                        self.add_output(f"Loaded: {path_to_file}.")
+                except Exception as e:
+                        # output = f" Error reading from file: {path_to_file}"
+                        self.add_output(f" Error reading from file: {path_to_file}")
+                        print(e)
+
+
+                cleaned_data = []
+                for song_name in all_entries:
+                        if song_name not in ignored_lines:
+                                cleaned_data.append(song_name.strip())
+
+
+                self.song_list = cleaned_data
+                print(cleaned_data)
+        
+        def create_playlist(self):
+                pb = PlaylistBot()
+                output_location = f"{len(self.song_list)}-{str(round(time.time()))}"
+                
+                # output = f'Downloading {len(self.song_list)} songs..\n'
+
+                self.add_output(f'Downloading {len(self.song_list)} songs..')
+                for song_title in self.song_list:
+                        try:
+                                url = pb.get_song_url_from_name(song_name=song_title)
+                                try:
+                                        pb.download_song_from_url(url, output_location)
+                                        
+                                        # output+=f'Downloaded: {song_title}'
+                                        print(f'Downloaded: {song_title}')
+                                        self.add_output(f'Downloaded: {song_title}')
+                                except Exception as e:
+                                        output+=f"Failed: \"{song_title}\""
+                                        self.add_output(f"Failed: \"{song_title}\"")
+                        except Exception as e:
+                                # output+=f"Failed: \"{song_title}\"\n"
+                                print(e)
+                                self.add_output(f"Failed: \"{song_title}\"")
+                                continue
+                self.add_output(f"Finished. {len(self.song_list)} songs.")
+                self.add_output(f"Saved to: {output_location}")
+
 def start_up():
     playlistbot_gui_support.main()
 
