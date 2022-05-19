@@ -195,7 +195,7 @@ class BackPanel:
                                         print(f'Downloaded: {song_title}')
                                         self.add_output(f'Downloaded: {song_title}')
                                 except Exception as e:
-                                        output+=f"Failed: \"{song_title}\""
+                                        #output+=f"Failed: \"{song_title}\""
                                         self.add_output(f"Failed: \"{song_title}\"")
                         except Exception as e:
                                 print(e)
