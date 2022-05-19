@@ -127,7 +127,7 @@ class BackPanel:
 
                 self.song_list = []
 
-                top.geometry("800x400+1172+276")
+                top.geometry("400x400+1172+276")
                 top.minsize(1, 1)
                 top.maxsize(2929, 1250)
                 top.resizable(1,  1)
@@ -136,27 +136,25 @@ class BackPanel:
                 top.configure(highlightcolor="black")
 
                 self.top = top
-
-                # background frame where controls are
                 self.controlFrame = tk.Frame(self.top)
-                self.controlFrame.place(relx=0.013, rely=0.025, relheight=0.938
-                        , relwidth=0.539)
+                self.controlFrame.place(relx=0.013, rely=0.025, relheight=0.363
+                        , relwidth=0.965)
                 self.controlFrame.configure(relief='groove')
                 self.controlFrame.configure(borderwidth="2")
                 self.controlFrame.configure(relief="groove")
                 self.controlFrame.configure(background="#2b2d35")
 
-                # entry box for input file
                 self.path_to_input = tk.StringVar()
                 self.inputFileEntry = tk.Entry(self.controlFrame, textvariable=self.path_to_input)
-                self.inputFileEntry.place(relx=0.023, rely=0.24, height=23
-                        , relwidth=0.942)
+                self.inputFileEntry.place(relx=0.026, rely=0.207, height=23
+                        , relwidth=0.948)
                 self.inputFileEntry.configure(background="white")
                 self.inputFileEntry.configure(font="TkFixedFont")
+                self.inputFileEntry.configure(selectbackground="#c4c4c4")
 
-                # input text label
                 self.Label1 = tk.Label(self.controlFrame)
-                self.Label1.place(relx=0.023, rely=0.16, height=21, width=229)
+                self.Label1.place(relx=0.023, rely=0.069, height=18, width=204)
+                self.Label1.configure(activebackground="#f9f9f9")
                 self.Label1.configure(anchor='w')
                 self.Label1.configure(background="#2b2d35")
                 self.Label1.configure(compound='left')
@@ -164,9 +162,8 @@ class BackPanel:
                 self.Label1.configure(foreground="#ffffff")
                 self.Label1.configure(text='''Enter path to input file:''')
 
-                # load input from file button
                 self.loadInputButton = tk.Button(self.controlFrame)
-                self.loadInputButton.place(relx=0.673, rely=0.347, height=23, width=113)
+                self.loadInputButton.place(relx=0.674, rely=0.483, height=23, width=113)
                 self.loadInputButton.configure(activebackground="beige")
                 self.loadInputButton.configure(background="#ccc7d8")
                 self.loadInputButton.configure(borderwidth="2")
@@ -174,9 +171,8 @@ class BackPanel:
                 self.loadInputButton.configure(relief="flat")
                 self.loadInputButton.configure(text='''Load Input''', command=lambda: self.load_file(self.path_to_input.get()))
 
-                # create playlist from input button
                 self.createPlaylistButton = tk.Button(self.controlFrame)
-                self.createPlaylistButton.place(relx=0.673, rely=0.453, height=33
+                self.createPlaylistButton.place(relx=0.674, rely=0.69, height=33
                         , width=113)
                 self.createPlaylistButton.configure(activebackground="beige")
                 self.createPlaylistButton.configure(background="#bed8c2")
@@ -185,24 +181,23 @@ class BackPanel:
                 self.createPlaylistButton.configure(relief="flat")
                 self.createPlaylistButton.configure(text='''Create Playlist''', command=lambda: self.create_playlist())
 
-                # console/logger output frame
                 self.outputFrame = tk.Frame(self.top)
-                self.outputFrame.place(relx=0.563, rely=0.025, relheight=0.938
-                        , relwidth=0.431)
+                self.outputFrame.place(relx=0.013, rely=0.4, relheight=0.563
+                        , relwidth=0.97)
                 self.outputFrame.configure(relief='groove')
                 self.outputFrame.configure(borderwidth="2")
                 self.outputFrame.configure(relief="groove")
                 self.outputFrame.configure(background="#000000")
 
-                self.outputTextBox = tk.Label(self.outputFrame, justify=LEFT)
-                self.outputTextBox.place(relx=0.029, rely=0.027, height=361, width=329)
+                self.outputTextBox = tk.Label(self.outputFrame)
+                self.outputTextBox.place(relx=0.026, rely=0.044, height=201, width=374)
+                self.outputTextBox.configure(activebackground="#f9f9f9")
                 self.outputTextBox.configure(anchor='nw')
                 self.outputTextBox.configure(background="#0c0c0c")
                 self.outputTextBox.configure(compound='left')
                 self.outputTextBox.configure(font="-family {DejaVu Sans} -size 10")
                 self.outputTextBox.configure(foreground="#5fc3e8")
-                self.outputTextBox.configure(text='''>''')
-
+                self.outputTextBox.configure(text='''> ''')
 def start_up():
     playlistbot_gui_support.main()
 
