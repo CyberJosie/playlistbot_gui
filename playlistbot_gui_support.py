@@ -4,7 +4,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import playlistbot_gui
+import playlist_bot
 
 def main(*args):
     '''Main entry point for the application.'''
@@ -14,12 +14,8 @@ def main(*args):
     # Creates a toplevel widget.
     global _top1, _w1
     _top1 = root
-    _w1 = playlistbot_gui.BackPanel(_top1)
+    _w1 = playlist_bot.BackPanel(_top1)
     root.mainloop()
 
 if __name__ == '__main__':
-    playlistbot_gui.start_up()
-
-
-
-
+    playlist_bot.start_up()
