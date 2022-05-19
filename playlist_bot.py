@@ -1,11 +1,11 @@
 
+from importlib.resources import path
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
 import playlistbot_gui_support
-
 import os
 from pytube import YouTube
 from datetime import datetime
@@ -46,11 +46,11 @@ class BackPanel:
         
         
         def __init__(self, top=None):
-                _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
-                _fgcolor = '#000000'  # X11 color: 'black'
-                _compcolor = 'gray40' # X11 color: #666666
-                _ana1color = '#c3c3c3' # Closest X11 color: 'gray76'
-                _ana2color = 'beige' # X11 color: #f5f5dc
+                _bgcolor = '#d9d9d9'
+                _fgcolor = '#000000'
+                _compcolor = 'gray40'
+                _ana1color = '#c3c3c3'
+                _ana2color = 'beige'
                 _tabfg1 = 'black' 
                 _tabfg2 = 'black' 
                 _tabbg1 = 'grey75' 
@@ -58,7 +58,7 @@ class BackPanel:
                 _bgmode = 'light'
 
                 self.song_list = []
-                self.console_data = ''
+                self.console_data = 'Playlist Bot v1.0.69\n'
 
                 top.geometry("400x400+1172+276")
                 top.minsize(1, 1)
@@ -122,7 +122,7 @@ class BackPanel:
                 self.outputFrame.configure(relief="groove")
                 self.outputFrame.configure(background="#000000")
 
-                # self.console_output = tk.StringVar()
+
                 self.console_output = tk.StringVar()
                 
                 self.outputTextBox = tk.Label(self.outputFrame, textvariable=self.console_output, justify=LEFT)
@@ -134,7 +134,6 @@ class BackPanel:
                 self.outputTextBox.configure(font="-family {DejaVu Sans} -size 10")
                 self.outputTextBox.configure(foreground="#5fc3e8")
                 self.console_output.set(self.console_data)
-                # self.outputTextBox.configure(text=self.console_output)
         
         def add_output(self, output_text):
                 self.console_data += f"{output_text}\n"
@@ -142,7 +141,6 @@ class BackPanel:
                 self.outputFrame.update()
         
         def load_file(self, path_to_file):
-                # output = ""
 
                 ignored_lines = [
                         ' ',
@@ -152,12 +150,13 @@ class BackPanel:
                         '\t\n',
                 ]
 
-                print(path_to_file)
-                # output += f'Loading: {path_to_file}..'
+                
+                if path_to_file[0] == '\"' and path_to_file[-1] == '\"':
+                        path_to_file = path_to_file[1:-1]
+
                 self.add_output(f'Loading: {path_to_file}..')
 
                 if not os.path.isfile(path_to_file):
-                        # output = f"{path_to_file} does\'nt exist."
                         self.add_output(f"{path_to_file} does\'nt exist.")
                         return
                         
@@ -167,10 +166,8 @@ class BackPanel:
                         all_entries = name_file.readlines()
                         name_file.close()
                         
-                        # output += f"Loaded: {path_to_file}."
                         self.add_output(f"Loaded: {path_to_file}.")
                 except Exception as e:
-                        # output = f" Error reading from file: {path_to_file}"
                         self.add_output(f" Error reading from file: {path_to_file}")
                         print(e)
 
@@ -182,13 +179,11 @@ class BackPanel:
 
 
                 self.song_list = cleaned_data
-                print(cleaned_data)
         
         def create_playlist(self):
                 pb = PlaylistBot()
                 output_location = f"{len(self.song_list)}-{str(round(time.time()))}"
                 
-                # output = f'Downloading {len(self.song_list)} songs..\n'
 
                 self.add_output(f'Downloading {len(self.song_list)} songs..')
                 for song_title in self.song_list:
@@ -197,14 +192,12 @@ class BackPanel:
                                 try:
                                         pb.download_song_from_url(url, output_location)
                                         
-                                        # output+=f'Downloaded: {song_title}'
                                         print(f'Downloaded: {song_title}')
                                         self.add_output(f'Downloaded: {song_title}')
                                 except Exception as e:
                                         output+=f"Failed: \"{song_title}\""
                                         self.add_output(f"Failed: \"{song_title}\"")
                         except Exception as e:
-                                # output+=f"Failed: \"{song_title}\"\n"
                                 print(e)
                                 self.add_output(f"Failed: \"{song_title}\"")
                                 continue
