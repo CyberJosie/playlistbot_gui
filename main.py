@@ -1,5 +1,6 @@
 import sys
 import json
+import time
 import platform
 from tkinter import messagebox
 from threading import Thread
@@ -118,13 +119,37 @@ class TopWindow:
         return output
     
     def output_daemon(self, downloaderThread):
-        last_printed = 0
-        while downloaderThread.is_alive():
-            if len(downloader_output) > last_printed:
-                length_delta = len(downloader_output) - last_printed
-                for i in range(last_printed, length_delta):
-                    self.downloaderOutputListBox.insert(i, downloader_output[i])
-                last_printed = len(downloader_output)
+        last_printed_index = 0
+        while True:
+            
+            if downloaderThread.is_alive():
+                current_dl_len = len(downloader_output)
+                if current_dl_len > last_printed_index:
+                    # length_delta = current_dl_len - last_printed_index+1
+
+                    # print(f'Last index: {last_printed_index}')
+                    # print(f"Length delta: {length_delta}")
+                    # for i in range(last_printed_index, length_delta-1):
+                        
+                        # self.downloaderOutputListBox.insert(i, downloader_output[i])
+                    self.draw_output_listbox(downloader_output)
+                    last_printed_index = len(downloader_output)
+                    time.sleep(0.5)
+            else:
+                break
+        print('Downloader Thread died.')
+    
+    def draw_output_listbox(self, list_of_output):
+        self.downloaderOutputListBox = ScrolledListBox(self.contentFrame)
+        self.downloaderOutputListBox.place(relx=0.017, rely=0.11, relheight=0.853, relwidth=0.968)
+        self.downloaderOutputListBox.configure(background="white")
+        self.downloaderOutputListBox.configure(cursor="xterm")
+        self.downloaderOutputListBox.configure(font="TkFixedFont")
+        self.downloaderOutputListBox.configure(highlightcolor="#d9d9d9")
+        self.downloaderOutputListBox.configure(selectbackground="#c4c4c4")
+
+        for i in range(0, len(list_of_output)-1):
+            self.downloaderOutputListBox.insert(i, list_of_output[i])
 
 
 class Pages(TopWindow):
@@ -244,13 +269,10 @@ class Pages(TopWindow):
 
 
         downloaderThread = playlist_bot.create_downloader(self.songs, self.output_playlist_filename)
-        # self.downloaderOutputListBox.insert(0, f'Downloading to playlist: {self.output_playlist_filename}...')
-        # self.downloaderOutputListBox.insert(1, f'Amount of songs: {len(self.songs)}')
-        # self.downloaderOutputListBox.insert(2, self.expand_list(self.songs))
-        # self.downloaderOutputListBox.insert(3, f'Downloading songs, please wait.')
         outputThread = Thread(target=self.output_daemon, args=(downloaderThread,))
         outputThread.daemon = True
         outputThread.start()
+        # self.output_daemon(downloaderThread)
         
         
         
