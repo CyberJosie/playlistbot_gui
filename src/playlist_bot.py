@@ -59,19 +59,29 @@ class PlaylistBot:
         log.entry(yt.title + " has been successfully downloaded.")
     
     def _download_from_song_list(self, list_of_song_titles, output_location):
+
+        downloader_output.append(f'Downloading to playlist: {output_location}...')
+        downloader_output.append(f'Amount of songs: {len(list_of_song_titles)}')
+        downloader_output.append(f'Downloading songs, please wait...')
+        
         for song_title in list_of_song_titles:
+            result = ''
             try:
                 url = self.get_song_url_from_name(song_name=song_title)
+                raw_url = url['link']
+                downloader_output.append(f'URL: {raw_url}')
                 try:
                     self.download_song_from_url(url, output_location)
-                    result = f'Successfully downloaded: {song_title}'
+                    downloader_output.append(f'Successfully downloaded: {song_title}')
                 except Exception as e:
-                    result = f" Failed downloading song \"{song_title}\""
+                    downloader_output.append(f" Failed downloading song \"{song_title}\"")
             except Exception as e:
-                result = f" No found song with this name: \"{song_title}\""
-                continue
-            downloader_output.append(result)
-        print("Finished.")
+                downloader_output.append(f" No found song with this name: \"{song_title}\"")
+
+        
+        print(os.path.join(os.getcwd(), output_location))
+        downloader_output.append(f'Output Location: {os.path.join(os.getcwd(), output_location)}')
+        downloader_output.append("Finished.")
     
     def create_downloader(self, list_of_songs, output_directory):
         downloaderThread = Thread(target=self._download_from_song_list, args=(list_of_songs, output_directory,))
