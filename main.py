@@ -2,20 +2,15 @@ import sys
 import json
 import time
 import platform
-from tkinter import messagebox
-from threading import Thread
 import tkinter as tk
 import tkinter.ttk as ttk
-from src.playlist_bot import *
+from threading import Thread
+from tkinter import messagebox
 from tkinter.constants import *
 
+from src.playlist_bot import *
+
 APP_NAME = "Playlist Bot"
-
-
-def message_box(box_title, box_message):
-    win = tk()
-    win.geometry("100x50")
-    messagebox.showerror(box_title, box_message)
 
 
 class TopWindow:
@@ -46,7 +41,7 @@ class TopWindow:
         self.songs = []
         self.output_playlist_filename = ''
         
-
+        # frame with app buttons
         self.controlFrame = tk.Frame(self.top)
         self.controlFrame.place(relx=0.013, rely=0.06, relheight=0.91, relwidth=0.231)
         self.controlFrame.configure(relief='solid')
@@ -54,15 +49,16 @@ class TopWindow:
         self.controlFrame.configure(relief="solid")
         self.controlFrame.configure(background="#404040")
 
+        # button that links to create a list page
         self.createListButton = tk.Button(self.controlFrame)
         self.createListButton.place(relx=0.054, rely=0.022, height=33, width=163)
-
         self.createListButton.configure(activebackground="#bd87ff")
         self.createListButton.configure(background="#BB86FC")
         self.createListButton.configure(compound='left')
         self.createListButton.configure(relief="flat")
         self.createListButton.configure(text='''Create New''', command=lambda: Pages.create_playlist(self))
 
+        # save song list page (not required)
         self.saveSongListButton = tk.Button(self.controlFrame)
         self.saveSongListButton.place(relx=0.054, rely=0.11, height=33, width=163)
         self.saveSongListButton.configure(activebackground="#bd87ff")
@@ -72,6 +68,7 @@ class TopWindow:
         self.saveSongListButton.configure(relief="flat")
         self.saveSongListButton.configure(text='''Save List''', command=lambda: Pages.save_song_list(self, self.playlist_name.get()))
 
+        # create playlist from song list button
         self.createPlaylistButton = tk.Button(self.controlFrame)
         self.createPlaylistButton.place(relx=0.054, rely=0.242, height=33, width=163)
         self.createPlaylistButton.configure(activebackground="#7350af")
@@ -84,6 +81,7 @@ class TopWindow:
         self.createPlaylistButton.configure(relief="flat")
         self.createPlaylistButton.configure(text='''Run Bot''', command=lambda: Pages.generate_playlist(self, self.playlist_name.get()))
 
+        # button to show help menu
         self.helpButton = tk.Button(self.controlFrame)
         self.helpButton.place(relx=0.054, rely=0.923, height=23, width=163)
         self.helpButton.configure(activebackground="#ccffd0")
@@ -93,6 +91,7 @@ class TopWindow:
         self.helpButton.configure(relief="flat")
         self.helpButton.configure(text='''Help''', command=lambda: Pages.help_page(self))
 
+        # content frame - shows data on each page
         self.contentFrame = tk.Frame(self.top)
         self.contentFrame.place(relx=0.25, rely=0.06, relheight=0.91, relwidth=0.744)
         self.contentFrame.configure(relief='solid')
@@ -104,27 +103,24 @@ class TopWindow:
         Pages.help_page(self)
         
         
-
+    # clear all existing eidgets in content frame
     def clear_content_frame(self):
         for widgets in self.contentFrame.winfo_children():
                 widgets.destroy()
 
+    # add a song to the song list, and update result
     def add_song(self, song_name):
         self.songs.append(song_name.strip())
         print(song_name)
         self.songTitlesListBox.insert(len(self.songs), song_name)
         self.clear_song_entry()
-    
-    def expand_list(self, list_elements):
 
-        output = [element+'\n' for element in list_elements]
-        # for element in list_elements:
-            # output+=element+'\n'
-        return output
-    
+    # clear the entry widget with song names 
     def clear_song_entry(self):
         self.songNameEntry.delete(0, END)
     
+    # daemon that catches new output from downloader thread
+    # and updates scrolled display with new content since they can not be updated
     def output_daemon(self, downloaderThread):
         last_printed_index = 0
         while True:
@@ -132,20 +128,13 @@ class TopWindow:
             if downloaderThread.is_alive():
                 current_dl_len = len(downloader_output)
                 if current_dl_len > last_printed_index:
-                    # length_delta = current_dl_len - last_printed_index+1
-
-                    # print(f'Last index: {last_printed_index}')
-                    # print(f"Length delta: {length_delta}")
-                    # for i in range(last_printed_index, length_delta-1):
-                        
-                        # self.downloaderOutputListBox.insert(i, downloader_output[i])
                     self.draw_output_listbox(downloader_output)
                     last_printed_index = len(downloader_output)
-                    time.sleep(0.5)
             else:
                 break
-        print('Downloader Thread died.')
     
+    # updates downloader output listbox with new content
+    # completely re-draws since they can not be updated (i think)
     def draw_output_listbox(self, list_of_output):
         self.downloaderOutputListBox = ScrolledListBox(self.contentFrame)
         self.downloaderOutputListBox.place(relx=0.017, rely=0.11, relheight=0.853, relwidth=0.968)
@@ -159,8 +148,11 @@ class TopWindow:
             self.downloaderOutputListBox.insert(i, list_of_output[i])
 
 
+# updates content frame with widgets for each page
 class Pages(TopWindow):
 
+    # enter song names on this page to form a playlist
+    # also give playlist a name
     def create_playlist(self):
         self.clear_content_frame()
     
@@ -215,29 +207,24 @@ class Pages(TopWindow):
         self.addSongButton.configure(relief="flat")
         self.addSongButton.configure(text='''Add''', command=lambda: self.add_song(self.tmp_song.get()))
     
+    # save song list so that is persists
     def save_song_list(self, playlist_name):
         self.clear_content_frame()
 
         if playlist_name == '':
-            # print('You need to name your playlist!')
             messagebox.showerror('error', 'You need to name your playlist!')
             Pages.create_playlist(self)
             return
-            
 
         print(f'Creating new playlist: {playlist_name}...')
         print(f'No. Songs: {len(self.songs)}')
         print(f'Songs: {json.dumps(self.songs, indent=2)}')
-    
-    # def expand_list(self, list_stuff):
         
-    
+    # generate local playlist of MP3 files from song titles
     def generate_playlist(self, playlist_name):
         self.clear_content_frame()
         
-
         if playlist_name == '':
-            # print('You need to name your playlist!')
             messagebox.showerror('Error!', 'You need to name your playlist!')
             Pages.create_playlist(self)
             return
@@ -274,20 +261,15 @@ class Pages(TopWindow):
         self.newPlaylistNameLabelValue.configure(foreground="#BB86FC")
         self.newPlaylistNameLabelValue.configure(text=playlist_name)
 
-
+        # starts output daemon so the frame finishes drawing. 
+        # directly calling will postpone the page being drawn
         downloaderThread = playlist_bot.create_downloader(self.songs, self.output_playlist_filename)
         outputThread = Thread(target=self.output_daemon, args=(downloaderThread,))
         outputThread.daemon = True
-        outputThread.start()
-        # self.output_daemon(downloaderThread)
+        outputThread.start()   
         
-        
-        
-        
-        
-
-        
-    
+    # page to show help content
+    # not user interaction here
     def help_page(self):
         self.clear_content_frame()
         self.helpPageLabel = tk.Label(self.contentFrame)
@@ -374,24 +356,11 @@ class Pages(TopWindow):
         self.appVersionValueLabel.configure(compound='left')
         self.appVersionValueLabel.configure(text='''v1.1.69 - Developed by Jocelyn <jocelyn@techjosie.com>''')
 
-
-
-
-
-
-
-
-
-
-
-
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
-    '''Configure the scrollbars for a widget.'''
+    # Configure the scrollbars for a widget.
     def __init__(self, master):
-        #  Rozen. Added the try-except clauses so that this class
-        #  could be used for scrolled entry widget for which vertical
-        #  scrolling is not supported. 5/7/14.
+
         try:
             vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
         except:
@@ -410,6 +379,7 @@ class AutoScroll(object):
         hsb.grid(column=0, row=1, sticky='ew')
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight=1)
+
         # Copy geometry methods of master  (taken from ScrolledText.py)
         methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
                   | tk.Place.__dict__.keys()
@@ -433,8 +403,8 @@ class AutoScroll(object):
         return str(self.master)
 
 def _create_container(func):
-    '''Creates a ttk Frame with a given master, and use this new frame to
-    place the scrollbars and the widget.'''
+    # Creates a ttk Frame with a given master, and use this new frame to
+    # place the scrollbars and the widget.
     def wrapped(cls, master, **kw):
         container = ttk.Frame(master)
         container.bind('<Enter>', lambda e: _bound_to_mousewheel(e, container))
@@ -443,8 +413,8 @@ def _create_container(func):
     return wrapped
 
 class ScrolledListBox(AutoScroll, tk.Listbox):
-    '''A standard Tkinter Listbox widget with scrollbars that will
-    automatically show/hide as needed.'''
+    # A standard Tkinter Listbox widget with scrollbars that will
+    # automatically show/hide as needed.
     @_create_container
     def __init__(self, master, **kw):
         tk.Listbox.__init__(self, master, **kw)
@@ -452,7 +422,6 @@ class ScrolledListBox(AutoScroll, tk.Listbox):
     def size_(self):
         sz = tk.Listbox.size(self)
         return sz
-
 
 def _bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
@@ -499,11 +468,9 @@ def _on_shiftmouse(event, widget):
 
 
 if __name__ == '__main__':
-    # app_template_support.main()
     global root
     root = tk.Tk()
     root.protocol( 'WM_DELETE_WINDOW' , root.destroy)
-    # Creates a toplevel widget.
     global _top1, _w1
     _top1 = root
     _w1 = TopWindow(_top1)
