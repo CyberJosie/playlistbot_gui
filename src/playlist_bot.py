@@ -2,6 +2,7 @@ from logging.config import valid_ident
 import os
 import string
 from threading import Thread
+import time
 from pytube import YouTube
 from datetime import datetime
 from youtubesearchpython import VideosSearch
@@ -63,6 +64,7 @@ class PlaylistBot:
         downloader_output.append(f'Downloading to playlist: {output_location}...')
         downloader_output.append(f'Amount of songs: {len(list_of_song_titles)}')
         downloader_output.append(f'Downloading songs, please wait...')
+        downloader_output.append(f'Output Location: {os.path.join(os.getcwd(), output_location)}')
         
         for song_title in list_of_song_titles:
             result = ''
@@ -77,11 +79,12 @@ class PlaylistBot:
                     downloader_output.append(f" Failed downloading song \"{song_title}\"")
             except Exception as e:
                 downloader_output.append(f" No found song with this name: \"{song_title}\"")
-
-        
-        print(os.path.join(os.getcwd(), output_location))
-        downloader_output.append(f'Output Location: {os.path.join(os.getcwd(), output_location)}')
         downloader_output.append("Finished.")
+        time.sleep(5)
+        
+        # print(os.path.join(os.getcwd(), output_location))
+        
+        
     
     def create_downloader(self, list_of_songs, output_directory):
         downloaderThread = Thread(target=self._download_from_song_list, args=(list_of_songs, output_directory,))
