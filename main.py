@@ -212,6 +212,8 @@ class Pages(TopWindow):
         self.newPlaylistNameLabelValue.configure(font="-family {DejaVu Sans} -size 11 -weight bold")
         self.newPlaylistNameLabelValue.configure(foreground="#BB86FC")
         self.newPlaylistNameLabelValue.configure(text=playlist_name)
+
+        playlist_bot.create_downloader(self.songs, self.output_playlist_filename)
     
     def help_page(self):
         self.clear_content_frame()
