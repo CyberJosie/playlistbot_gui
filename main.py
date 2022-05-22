@@ -131,6 +131,8 @@ class TopWindow:
                     self.draw_output_listbox(downloader_output)
                     last_printed_index = len(downloader_output)
             else:
+                downloader_output.append('Finished.')
+                self.draw_output_listbox(downloader_output)
                 break
     
     def persist_song_list(self, output_file, list_of_songs):
