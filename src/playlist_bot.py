@@ -1,11 +1,11 @@
-from logging.config import valid_ident
 import os
-import string
-from threading import Thread
 import time
+import string
 from pytube import YouTube
+from threading import Thread
 from datetime import datetime
 from youtubesearchpython import VideosSearch
+
 
 global downloader_output
 downloader_output = []
@@ -26,7 +26,7 @@ class ProcessLogger:
             f.write(f"[{self.timestamp()}] {content}\n")
             f.close()
         except Exception as e:
-            # print(e)
+            print(e)
             pass
 
 class PlaylistBot:
@@ -67,7 +67,6 @@ class PlaylistBot:
         downloader_output.append(f'Output Location: {os.path.join(os.getcwd(), output_location)}')
         
         for song_title in list_of_song_titles:
-            result = ''
             try:
                 url = self.get_song_url_from_name(song_name=song_title)
                 raw_url = url['link']
@@ -80,10 +79,7 @@ class PlaylistBot:
             except Exception as e:
                 downloader_output.append(f" No found song with this name: \"{song_title}\"")
         downloader_output.append("Finished.")
-        time.sleep(5)
-        
-        # print(os.path.join(os.getcwd(), output_location))
-        
+        time.sleep(5)        
         
     
     def create_downloader(self, list_of_songs, output_directory):
@@ -93,34 +89,6 @@ class PlaylistBot:
         print(f'Started downloader thread!')
         return downloaderThread
     
-
-    def load_input_songs_by_name(self, text_file, output_location):
-        log  = ProcessLogger()        
-        if not os.path.isfile(text_file):
-            print(f" {text_file} is not a valid file.")
-            exit()
-        
-        try:
-            name_file = open(text_file, 'r')
-            all_entries = name_file.readlines()
-            name_file.close()
-            print(f" Read from file: {text_file}")
-        except Exception as e:
-            print(f" Error reading from file: {text_file}\n{e}")
-            exit()
-
-        for song_title in all_entries:
-            try:
-                url = self.get_song_url_from_name(song_name=song_title)
-
-                try:
-                    self.download_song_from_url(url, output_location)
-                except Exception as e:
-                    log.entry(f" Failed downloading song \"{song_title}\"")
-            except Exception as e:
-                log.entry(f" No found song with this name: \"{song_title}\"")
-                continue
-        print(" Finished.")
     
     def create_valid_filename_from_playlist_title(self, playlist_title, interpolate_spaces=True):
         valid_chars = f'-_.() {string.ascii_letters}{string.digits}'
