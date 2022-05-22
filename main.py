@@ -110,6 +110,7 @@ class TopWindow:
         self.songs.append(song_name.strip())
         print(song_name)
         self.songTitlesListBox.insert(len(self.songs), song_name)
+        self.clear_song_entry()
     
     def expand_list(self, list_elements):
 
@@ -117,6 +118,9 @@ class TopWindow:
         # for element in list_elements:
             # output+=element+'\n'
         return output
+    
+    def clear_song_entry(self):
+        self.songNameEntry.delete(0, END)
     
     def output_daemon(self, downloaderThread):
         last_printed_index = 0
