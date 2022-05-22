@@ -1,12 +1,21 @@
 import sys
 import json
 import platform
+from tkinter import messagebox
 import tkinter as tk
 import tkinter.ttk as ttk
 from src.playlist_bot import *
 from tkinter.constants import *
 
 APP_NAME = "Playlist Bot"
+
+
+def message_box(box_title, box_message):
+    win = tk()
+    win.geometry("100x50")
+    messagebox.showerror(box_title, box_message)
+
+
 
 class TopWindow:
 
@@ -161,7 +170,8 @@ class Pages(TopWindow):
         self.clear_content_frame()
 
         if playlist_name == '':
-            print('You need to name your playlist!')
+            # print('You need to name your playlist!')
+            messagebox.showerror('error', 'You need to name your playlist!')
             Pages.create_playlist(self)
             return
             
@@ -177,7 +187,8 @@ class Pages(TopWindow):
         
 
         if playlist_name == '':
-            print('You need to name your playlist!')
+            # print('You need to name your playlist!')
+            messagebox.showerror('Error!', 'You need to name your playlist!')
             Pages.create_playlist(self)
             return
         
