@@ -1,4 +1,6 @@
+from logging.config import valid_ident
 import os
+import string
 from pytube import YouTube
 from datetime import datetime
 from youtubesearchpython import VideosSearch
@@ -52,8 +54,6 @@ class PlaylistBot:
         os.rename(out_file, new_file)
         log.entry(yt.title + " has been successfully downloaded.")
 
-
-
     def load_input_songs_by_name(self, text_file, output_location):
         log  = ProcessLogger()        
         if not os.path.isfile(text_file):
@@ -81,4 +81,12 @@ class PlaylistBot:
                 log.entry(f" No found song with this name: \"{song_title}\"")
                 continue
         print(" Finished.")
+    
+    def create_valid_filename_from_playlist_title(self, playlist_title, interpolate_spaces=True):
+        valid_chars = f'-_.() {string.ascii_letters}{string.digits}'
+        valid_filename = ''.join(c for c in playlist_title if c in valid_chars)
+
+        if interpolate_spaces:
+            valid_filename = valid_filename.replace(' ', '_')
+        return valid_filename
 
