@@ -34,6 +34,7 @@ class TopWindow:
         self.top = top
         self.playlist_name = tk.StringVar()
         self.songs = []
+        self.output_playlist_filename = ''
         
 
         self.controlFrame = tk.Frame(self.top)
@@ -168,14 +169,21 @@ class Pages(TopWindow):
         print(f'Creating new playlist: {playlist_name}...')
         print(f'No. Songs: {len(self.songs)}')
         print(f'Songs: {json.dumps(self.songs, indent=2)}')
+        
     
     def generate_playlist(self, playlist_name):
         self.clear_content_frame()
+
+        
 
         if playlist_name == '':
             print('You need to name your playlist!')
             Pages.create_playlist(self)
             return
+        
+        playlist_bot = PlaylistBot()
+        self.output_playlist_filename = playlist_bot.create_valid_filename_from_playlist_title(playlist_name)
+        print(f'Valid Filename: {self.output_playlist_filename}')
 
         self.Scrolledlistbox1 = ScrolledListBox(self.contentFrame)
         self.Scrolledlistbox1.place(relx=0.017, rely=0.11, relheight=0.853, relwidth=0.968)
