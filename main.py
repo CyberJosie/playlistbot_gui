@@ -2,6 +2,7 @@ import sys
 import json
 import platform
 from tkinter import messagebox
+from threading import Thread
 import tkinter as tk
 import tkinter.ttk as ttk
 from src.playlist_bot import *
@@ -14,7 +15,6 @@ def message_box(box_title, box_message):
     win = tk()
     win.geometry("100x50")
     messagebox.showerror(box_title, box_message)
-
 
 
 class TopWindow:
@@ -109,6 +109,23 @@ class TopWindow:
         self.songs.append(song_name.strip())
         print(song_name)
         self.songTitlesListBox.insert(len(self.songs), song_name)
+    
+    def expand_list(self, list_elements):
+
+        output = [element+'\n' for element in list_elements]
+        # for element in list_elements:
+            # output+=element+'\n'
+        return output
+    
+    def output_daemon(self, downloaderThread):
+        last_printed = 0
+        while downloaderThread.is_alive():
+            if len(downloader_output) > last_printed:
+                length_delta = len(downloader_output) - last_printed
+                for i in range(last_printed, length_delta):
+                    self.downloaderOutputListBox.insert(i, downloader_output[i])
+                last_printed = len(downloader_output)
+
 
 class Pages(TopWindow):
 
@@ -179,11 +196,12 @@ class Pages(TopWindow):
         print(f'Creating new playlist: {playlist_name}...')
         print(f'No. Songs: {len(self.songs)}')
         print(f'Songs: {json.dumps(self.songs, indent=2)}')
+    
+    # def expand_list(self, list_stuff):
         
     
     def generate_playlist(self, playlist_name):
         self.clear_content_frame()
-
         
 
         if playlist_name == '':
@@ -196,13 +214,13 @@ class Pages(TopWindow):
         self.output_playlist_filename = playlist_bot.create_valid_filename_from_playlist_title(playlist_name)
         print(f'Valid Filename: {self.output_playlist_filename}')
 
-        self.Scrolledlistbox1 = ScrolledListBox(self.contentFrame)
-        self.Scrolledlistbox1.place(relx=0.017, rely=0.11, relheight=0.853, relwidth=0.968)
-        self.Scrolledlistbox1.configure(background="white")
-        self.Scrolledlistbox1.configure(cursor="xterm")
-        self.Scrolledlistbox1.configure(font="TkFixedFont")
-        self.Scrolledlistbox1.configure(highlightcolor="#d9d9d9")
-        self.Scrolledlistbox1.configure(selectbackground="#c4c4c4")
+        self.downloaderOutputListBox = ScrolledListBox(self.contentFrame)
+        self.downloaderOutputListBox.place(relx=0.017, rely=0.11, relheight=0.853, relwidth=0.968)
+        self.downloaderOutputListBox.configure(background="white")
+        self.downloaderOutputListBox.configure(cursor="xterm")
+        self.downloaderOutputListBox.configure(font="TkFixedFont")
+        self.downloaderOutputListBox.configure(highlightcolor="#d9d9d9")
+        self.downloaderOutputListBox.configure(selectbackground="#c4c4c4")
 
         self.creatingPlaylistLabel = tk.Label(self.contentFrame)
         self.creatingPlaylistLabel.place(relx=0.017, rely=0.022, height=31, width=169)
@@ -224,7 +242,22 @@ class Pages(TopWindow):
         self.newPlaylistNameLabelValue.configure(foreground="#BB86FC")
         self.newPlaylistNameLabelValue.configure(text=playlist_name)
 
-        playlist_bot.create_downloader(self.songs, self.output_playlist_filename)
+
+        downloaderThread = playlist_bot.create_downloader(self.songs, self.output_playlist_filename)
+        # self.downloaderOutputListBox.insert(0, f'Downloading to playlist: {self.output_playlist_filename}...')
+        # self.downloaderOutputListBox.insert(1, f'Amount of songs: {len(self.songs)}')
+        # self.downloaderOutputListBox.insert(2, self.expand_list(self.songs))
+        # self.downloaderOutputListBox.insert(3, f'Downloading songs, please wait.')
+        outputThread = Thread(target=self.output_daemon, args=(downloaderThread,))
+        outputThread.daemon = True
+        outputThread.start()
+        
+        
+        
+        
+        
+
+        
     
     def help_page(self):
         self.clear_content_frame()
