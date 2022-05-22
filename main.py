@@ -133,6 +133,19 @@ class TopWindow:
             else:
                 break
     
+    def persist_song_list(self, output_file, list_of_songs):
+        if not os.path.isdir(os.path.join(os.getcwd(), output_file)):
+            os.mkdir(os.path.join(os.getcwd(), output_file))
+
+        try:
+            f = open(os.path.join(os.getcwd(), output_file, 'song_list.txt'), 'a')
+            for song in list_of_songs:
+                f.write(f'{song}\n')
+            f.close()
+        except Exception as e:
+            print(e)
+            
+    
     # updates downloader output listbox with new content
     # completely re-draws since they can not be updated (i think)
     def draw_output_listbox(self, list_of_output):
@@ -209,7 +222,6 @@ class Pages(TopWindow):
     
     # save song list so that is persists
     def save_song_list(self, playlist_name):
-        self.clear_content_frame()
 
         if playlist_name == '':
             messagebox.showerror('error', 'You need to name your playlist!')
@@ -219,6 +231,9 @@ class Pages(TopWindow):
         print(f'Creating new playlist: {playlist_name}...')
         print(f'No. Songs: {len(self.songs)}')
         print(f'Songs: {json.dumps(self.songs, indent=2)}')
+
+        self.persist_song_list(playlist_name, self.songs)
+        messagebox.showinfo('Saved!', f'There will be a \'song_list.txt\' in the playlist output directory. Click \'Run Bot\' to finish.')
         
     # generate local playlist of MP3 files from song titles
     def generate_playlist(self, playlist_name):
