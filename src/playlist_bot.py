@@ -1,6 +1,7 @@
 from logging.config import valid_ident
 import os
 import string
+from threading import Thread
 from pytube import YouTube
 from datetime import datetime
 from youtubesearchpython import VideosSearch
@@ -53,6 +54,27 @@ class PlaylistBot:
         new_file = base + '.mp3'
         os.rename(out_file, new_file)
         log.entry(yt.title + " has been successfully downloaded.")
+    
+    def _download_from_song_list(self, list_of_song_titles, output_location):
+        for song_title in list_of_song_titles:
+            try:
+                url = self.get_song_url_from_name(song_name=song_title)
+
+                try:
+                    self.download_song_from_url(url, output_location)
+                except Exception as e:
+                    print(f" Failed downloading song \"{song_title}\"")
+            except Exception as e:
+                print(f" No found song with this name: \"{song_title}\"")
+                continue
+        print("Finished.")
+    
+    def create_downloader(self, list_of_songs, output_directory):
+        downloaderThread = Thread(target=self._download_from_song_list, args=(list_of_songs, output_directory,))
+        downloaderThread.daemon = True
+        downloaderThread.start()
+        print(f'Started downloader thread!')
+    
 
     def load_input_songs_by_name(self, text_file, output_location):
         log  = ProcessLogger()        
