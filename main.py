@@ -100,6 +100,9 @@ class TopWindow:
         self.contentFrame.configure(relief="solid")
         self.contentFrame.configure(background="#404040")
         
+        # show help page by default
+        Pages.help_page(self)
+        
         
 
     def clear_content_frame(self):
