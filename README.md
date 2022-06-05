@@ -15,3 +15,7 @@ python3 -m pip install -r requirements.txt
 ```
 python3 main.py
 ```
+
+
+# Known Bugs
+* text file of song list does not save to same directory as playlist. 
