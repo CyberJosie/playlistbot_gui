@@ -28,7 +28,7 @@ class TopWindow:
         _tabbg2 = 'grey89' 
         _bgmode = 'light' 
 
-        top.geometry("800x500+1143+218")
+        top.geometry("800x500+20+20")
         top.minsize(1, 1)
         top.maxsize(2929, 1250)
         top.resizable(1,  1)
